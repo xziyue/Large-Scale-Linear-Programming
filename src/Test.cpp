@@ -156,4 +156,32 @@ void test_SimplexMethod() {
 	cout << "maximum value: " << max_val << "\n";
 }
 
+void test_LargeScaleSimplexMethod() {
+	// generate a 2000x3000 random matrix
+	
+	Eigen::MatrixXd* matrix= new Eigen::MatrixXd{ Eigen::MatrixXd::Random(2000,3000)};
+
+	// generate random vec_b and vec_c
+	Eigen::MatrixXd vec_b{ Eigen::MatrixXd::Random(2000,1) };
+	vec_b = vec_b.cwiseAbs().eval();
+	Eigen::MatrixXd vec_c{ Eigen::MatrixXd::Random(1,3000) };
+
+	// write matrix into file
+	OnDiskMatrix<double> ondisk{ "matrix.mat",2000,3000 };
+	for (auto i = 0; i < matrix->rows(); ++i) {
+		ondisk.write_row(matrix->row(i), i);
+	}
+
+	// release memory
+	delete matrix;
+
+	// run simplex method
+	SimplexMethod<double> simplex{ "matrix.mat",vec_b,vec_c };
+
+	double max_val;
+	auto sol{ move(simplex.solve(max_val)) };
+
+	cout << max_val;
+}
+
 #endif // COMPILE_TEST

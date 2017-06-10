@@ -12,8 +12,6 @@ struct NoSolutionError :public exception {
 	using exception::exception;
 };
 
-
-
 template<typename V>
 class SimplexMethod {
 public:
@@ -42,7 +40,12 @@ public:
 
 	// returns the map of solutions, set val to be the maximum value
 	SolutionType solve(value_type &val) {
-		while (!run_once());
+		auto run = 0;
+		while (!run_once()) {
+			cout << "running iteration :" << (run++) << "\n";
+		}
+
+		cout << "solving finished.\n";
 		// generate solution map
 		SolutionType sol;
 		auto x_b = get_x_b_vec();
@@ -258,6 +261,10 @@ private:
 		expr_check(original_matrix.cols() >= original_matrix.rows(), "the size of matrix is invalid");
 		expr_check(original_matrix.rows() == _vec_b.rows(), size_matching_info);
 		expr_check(original_matrix.cols() == _vec_c.cols(), size_matching_info);
+
+		for (auto i = 0; i < _vec_b.rows(); ++i) {
+			expr_check(_vec_b(i, 0) > mach_eps, "invalid b vector");
+		}
 	}
 
 	value_type find_big_M(const DenseMatrixType &vec_c) {
@@ -277,6 +284,7 @@ private:
 		vector_size_check(original_mat, _vec_b, _vec_c);
 
 		// create a new matrix
+		cout << "generating extended matrix...\n";
 		auto new_filename = filename + string{ "_extended" };
 		ondisk_mat = move(unique_ptr<DiskMatrixType>{ new DiskMatrixType{ new_filename,original_mat.rows(),original_mat.cols() + original_mat.rows() } });
 
@@ -293,6 +301,7 @@ private:
 
 		
 		// generate transpose matrix
+		cout << "generating transpose matrix...\n";
 		auto trans_filename = filename + string{ "_t" };
 		ondisk_mat->generate_transpose_matrix(trans_filename);
 		ondisk_trans = move(unique_ptr<DiskMatrixType>{new DiskMatrixType{ trans_filename }});

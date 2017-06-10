@@ -4,7 +4,7 @@
 int main()
 {
 
-	test_SimplexMethod();
+	test_LargeScaleSimplexMethod();
 	system("pause");
 	return 0;
 }

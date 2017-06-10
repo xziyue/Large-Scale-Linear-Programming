@@ -47,6 +47,9 @@ void test_OnDiskMatrix_ReadingTime();
 
 void test_SimplexMethod();
 
+// generate a random matrix and test RAM usage, not guaranteed to have a result.
+void test_LargeScaleSimplexMethod();
+
 
 #endif
 
