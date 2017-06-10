@@ -31,6 +31,7 @@ public:
 	}
 
 	/*
+	// NOT IMPLEMENTED YET
 	// run simplex method with matrix with artificial variables already
 	SimplexMethod(const string &extended_mat_filename, const string &extended_mat_trans_filename,
 		const DenseMatrixType &_vec_b, const DenseMatrixType &_vec_c) {
@@ -133,19 +134,10 @@ protected:
 			ret(0, i) = (product_row * col)(0, 0);
 		}
 
-		//cout << "c_n :" << c_n << endl;
-		//cout << "ret: " << ret << endl;
-
 		return c_n - ret;
 	}
 
 	void base_alteration(int out_pos, int in_pos, const DenseMatrixType &y_k) {
-		//auto out_pos = guaranteed_sequencial_find(base, out_of_base);
-		//auto in_pos = guaranteed_sequencial_find(non_base, into_base);
-
-		//auto y_k = ondisk_trans->read_row(into_base);
-		//y_k = (B_inv * y_k).eval();
-
 		value_type major_element = y_k(out_pos,0);
 
 		vector<TripletType> elements;
@@ -165,21 +157,12 @@ protected:
 		SparseMatrixType mat_e{ B_inv.rows(),B_inv.cols() };
 		mat_e.setFromTriplets(elements.begin(), elements.end());
 
-		//DenseMatrixType e_dense{ mat_e };
-		//cout << e_dense << endl;
-
 		B_inv = (mat_e * B_inv).eval();
 
 		// set the base vectors
 		auto out = base[out_pos];
 		base[out_pos] = non_base[in_pos];
 		non_base[in_pos] = out;
-
-		/*
-		auto print = [](int ele) {cout << ele << " "; };
-		for_each(base.begin(), base.end(), print); cout << endl;
-		for_each(non_base.begin(), non_base.end(), print); cout << endl;
-		*/
 	}
 
 	bool run_once() {
@@ -203,8 +186,6 @@ protected:
 		}
 
 
-		//cout << sigma_vec << endl;
-
 		// find the one that should go into base
 		auto into_base = 0;
 		value_type max_val = sigma_vec(0, 0);
@@ -219,7 +200,6 @@ protected:
 		bool no_sol = true;
 		auto p_k = ondisk_trans->read_row(non_base[into_base]);
 		p_k.transposeInPlace();
-		//cout << "p k:" << p_k.transpose() << endl;
 		for (auto i = 0; i < p_k.rows(); ++i) {
 			if (p_k(i,0) > mach_eps) {
 				no_sol = false;
@@ -238,8 +218,6 @@ protected:
 			else vec_test(i,0) = x_b(i,0) / y_k(i,0);
 		}
 
-		//cout << vec_test.transpose() << endl;
-
 		auto out_of_base = 0;
 		value_type min_val = vec_test(0,0);
 		for (auto i = 1; i < vec_test.rows(); ++i) {
@@ -249,9 +227,6 @@ protected:
 			}
 		}
 
-
-		// apply base alteration
-		//cout << "out of base index: " << out_of_base << " into base index:" << into_base << "\n";
 		base_alteration(out_of_base,into_base,y_k);
 
 		return false;
@@ -335,9 +310,6 @@ private:
 		for (auto i = _vec_c.cols(); i < vec_c.cols(); ++i) {
 			vec_c(0, i) = -big_M;
 		}
-
-		// checking vec_c
-		//cout << fixed << setprecision(5) << vec_c << "\n";
 
 		// set base and non-base pointers
 		for (int i = 0; i < _vec_c.cols(); ++i) {
